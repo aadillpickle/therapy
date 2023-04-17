@@ -3,7 +3,7 @@ import Passkey from './Passkey';
 import usePasskey from '../usePasskey';
 
 function Main () {
-  const [input, setInput] = useState(null);
+  const inputRef = useRef(null);
   const [data, setData] = useState("");
   const [passkey, setPasskey] = usePasskey(null);
 
@@ -14,6 +14,8 @@ function Main () {
 
   const handleSubmit = async (event) => {
     setLoading(true)
+    const input = inputRef.current.value;
+    inputRef.current.value = "";
     event.preventDefault();
     const resp = await fetch(process.env.REACT_APP_API_ROOT + '/therapize', {
       method: 'POST',
@@ -60,10 +62,10 @@ function Main () {
       <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
         <div className= " text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 mb-4 font-bold">How are you, really?</div>
         <input
-          className="w-3/4 md:w-1/3 h-16 pl-4 bg-white placeholder:text-slate-500 rounded-md font-gilroy text-md border-2 border-slate-500"
+          className="w-3/4 md:w-1/3 h-16 pl-4 bg-white placeholder:text-slate-400 rounded-md font-gilroy text-md border-2 border-slate-500"
           placeholder="im upset"
           type="text"
-          onChange={(e) => setInput(e.target.value)}
+          ref={inputRef}
         />
         <button
           className={"rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"}
