@@ -91,7 +91,7 @@ function Main () {
           </div>
         </div>}
         {/* {data && !loading && <><p className="mt-4 w-5/6 md:w-1/2 h-1/5 md:h-2/5 text-center text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">{data}</p><div className="text-center text-xs">Scroll for more ↓</div></>} */}
-        {data && !loading && <><p className="mt-4 w-1/2 md:w-1/4 h-1/12 md:h-1/6 text-center text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">{data}</p></>}
+        {data && !loading && <><p className="mt-4 w-1/2 md:w-1/4 h-1/12 md:h-1/6 text-center text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">{data}</p><div className="text-center text-xs">Scroll for more ↓</div></>}
         <button className="text-black font-gilroy absolute bottom-0 right-0 text-lg m-4 border-2 border-slate-600 rounded-lg p-4" onClick={deleteAllData}>Delete all my chat data</button>
       </div>
   )
