@@ -66,6 +66,7 @@ function Passkey () {
             </svg>
           </div>
         </div>}
+        <button className="text-white font-gilroy absolute bottom-0 right-0 text-lg m-4 border-2 border-slate-600 rounded-lg p-4" onClick={() => {window.open("https://buy.stripe.com/8wM9Dv8Mv8Z005q7ss", '_blank')}}>Want access?</button>
       </div>
   )
 
