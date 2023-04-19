@@ -15,7 +15,7 @@ const MessageHistory = (messageHistory) => {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto">
         <h2 className="text-xl font-bold mb-4">Message History</h2>
-        <div className="max-h-64 overflow-y-auto mb-4">
+        <div className="max-h-[80vh] overflow-y-auto mb-4">
         {messageHistory.map((message, idx) => {
           if (idx === 0) return null;
 
