@@ -72,6 +72,11 @@ function Main () {
           placeholder="im upset"
           type="text"
           ref={inputRef}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              handleSubmit(event);
+            }
+          }}
         />
         <button
           className={"rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"}
