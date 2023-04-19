@@ -201,7 +201,7 @@ def message_history_route():
     if passkey in VALID_PASSKEYS:
       posthog.capture(passkey, 'retrieved chat data')
       user = USERS.find_one({'passkey': passkey})
-      response_object["message"] = user['message_history'][-20:]
+      response_object["message"] = user['message_history'][-1:]#last 20
     else:
       raise Exception("Invalid passkey")
 
