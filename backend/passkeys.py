@@ -18,5 +18,5 @@ VALID_PASSKEYS = [
   {'yinyang-temari-tesseract-champion' : 'jake'},
   {'platform-tenten-threebody-goodlife' : 'ananya'},
   {'atlanta-sarutobi-solarwave-bound' : 'daekun'},
-  'disrupt-sasuke-dimension-shift'
+  {'disrupt-sasuke-dimension-shift' : 'riley'}
 ]
