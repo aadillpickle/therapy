@@ -183,5 +183,38 @@ def delete_all_data_route():
     mimetype=mimetype
   )
 
+@app.route('/message-history', methods=['POST'])
+def message_history_route():
+  #Sample response attributes
+  response_object = {}
+  mimetype="application/json"
+  status = 0
+
+  try:
+    #Parse json request
+    req_json = request.get_json()
+    print(req_json)
+    passkey = req_json['passkey']
+    
+    #extract anonymous id from posthog cookie
+    # posthog_cookie = request.cookies.get('ph_')
+    if passkey in VALID_PASSKEYS:
+      posthog.capture(passkey, 'retrieved chat data')
+      user = USERS.find_one({'passkey': passkey})
+      response_object["message"] = user['message_history'][-20:]
+    else:
+      raise Exception("Invalid passkey")
+
+    status = 200
+  except Exception as e:
+    response_object["message"] = f"Server error: {e}"
+    status = 400
+
+  return Response(
+    json.dumps(response_object),
+    status=status,
+    mimetype=mimetype
+  )
+
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=PORT, debug=True)
