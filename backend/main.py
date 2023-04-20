@@ -41,7 +41,17 @@ VALID_PASSKEYS = [
   'yinyang-temari-tesseract-champion',
   'platform-tenten-threebody-goodlife',
   'atlanta-sarutobi-solarwave-bound',
-  'disrupt-sasuke-dimension-shift'
+  'disrupt-sasuke-dimension-shift',
+  'compression-zabuza-gravitational-waves',
+  'bream-hall-rocklee-tauzero',
+  'laflamme-uzumaki-galacticraft-fatherstretch',
+  'edchambers-kiba-curtainspace-bloodonleaves',
+  'decentralized-kankuro-sunspot-ultralightbeam',
+  'fooman-minato-axioms-diamonds',
+  'techcrunch-naruto-halointerpreter-spaceship',
+  'laurie-anko-evaporatingriver-lowlights',
+  'carver-hyuga-microuniverse-mrwest',
+  'chuyan-woodstyle-lostinspace-mercy'
 ]
 
 COST_PER_TOKEN = 0.000002

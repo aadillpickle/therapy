@@ -18,5 +18,15 @@ VALID_PASSKEYS = [
   {'yinyang-temari-tesseract-champion' : 'jake'},
   {'platform-tenten-threebody-goodlife' : 'ananya'},
   {'atlanta-sarutobi-solarwave-bound' : 'daekun'},
-  {'disrupt-sasuke-dimension-shift' : 'riley'}
+  {'disrupt-sasuke-dimension-shift' : 'riley'},
+  {'compression-zabuza-gravitational-waves': ''},
+  {'bream-hall-rocklee-tauzero': 'ayana'},
+  {'laflamme-uzumaki-galacticraft-fatherstretch': 'carson'},
+  {'edchambers-kiba-curtainspace-bloodonleaves': 'sigil'},
+  {'decentralized-kankuro-sunspot-ultralightbeam': 'agosh'},
+  {'fooman-minato-axioms-diamonds': 'metaversemae'},
+  {'techcrunch-naruto-halointerpreter-spaceship': 'laurel'},
+  {'laurie-anko-evaporatingriver-lowlights': 'aleem'},
+  {'carver-hyuga-microuniverse-mrwest': ''},
+  {'chuyan-woodstyle-lostinspace-mercy': ''}
 ]
