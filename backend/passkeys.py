@@ -1,4 +1,4 @@
-VALID_PASSKEYS = [
+PASSKEYS = [
   {'gavin-hinata-trisolaris-goldigger' : 'master'} ,
   {'erlich-neji-wilderness-telegraph' : 'parth'},
   {'hooli-konoha-waterdrop-graduation' : 'morgan'},
@@ -19,7 +19,7 @@ VALID_PASSKEYS = [
   {'platform-tenten-threebody-goodlife' : 'ananya'},
   {'atlanta-sarutobi-solarwave-bound' : 'daekun'},
   {'disrupt-sasuke-dimension-shift' : 'riley'},
-  {'compression-zabuza-gravitational-waves': ''},
+  {'compression-zabuza-gravitational-waves': 'sarthak'},
   {'bream-hall-rocklee-tauzero': 'ayana'},
   {'laflamme-uzumaki-galacticraft-fatherstretch': 'carson'},
   {'edchambers-kiba-curtainspace-bloodonleaves': 'sigil'},
@@ -27,6 +27,16 @@ VALID_PASSKEYS = [
   {'fooman-minato-axioms-diamonds': 'metaversemae'},
   {'techcrunch-naruto-halointerpreter-spaceship': 'laurel'},
   {'laurie-anko-evaporatingriver-lowlights': 'aleem'},
-  {'carver-hyuga-microuniverse-mrwest': ''},
-  {'chuyan-woodstyle-lostinspace-mercy': ''}
+  {'carver-hyuga-microuniverse-mrwest': 'justina'},
+  {'chuyan-woodstyle-lostinspace-mercy': 'aahana'},
+  {'jin-yang-tsunade-starrylaunch': 'emil'},
+  {'software-iruka-spacecollapse-roses': ''},
+  {'petergregory-choza-entangledastro-tribe': ''},
+  {'gavinbelson-maitogai-blackhole-leaders': ''},
+  {'platform-inoichi-solarsail-selah': ''},
+  {'nelsonbighetti-yamato-pandemonium-followgod': ''},
+  {'middleout-shino-deepstructure-streetlights': ''},
+  {'adversarial-itachi-cosmicballoon-allfallsdown': ''},
+  {'ronlaflamme-konan-hibernation-heardem': ''},
+  {'pipepal-kabuto-planetree-waves': ''}
 ]
