@@ -7,6 +7,7 @@ from posthog import Posthog
             
 from prompts import therapy_prompt
 from db import USERS, PROMPTS
+from passkeys import PASSKEYS
 
 import os
 import openai
@@ -21,39 +22,7 @@ CORS(app)
 
 PORT = os.environ.get('PORT', 8000)
 
-VALID_PASSKEYS = [
-  'gavin-hinata-trisolaris-goldigger',
-  'erlich-neji-wilderness-telegraph',
-  'hooli-konoha-waterdrop-graduation',
-  'bighead-kurama-ether-redbone',
-  'nelson-akatsuki-cosmicrays-bonfire',
-  'raviga-kakashi-lighttomb-late',
-  'monica-hall-ramen-heartbreak',
-  'actionjack-kage-sophons-saintpablo',
-  'guilfoyle-shikamaru-blackdomain-ye',
-  'jared-shuriken-galactic-awaken',
-  'piedpiper-orochimaru-photons-stronger',
-  'aviato-sakura-droplet-flashlight',
-  'endframe-ino-crisisera-college',
-  'middleout-choji-darkforest-cudi',
-  'nucleus-gaara-spacetime-wolves',
-  'hoverboard-kisame-redcoast-famous',
-  'yinyang-temari-tesseract-champion',
-  'platform-tenten-threebody-goodlife',
-  'atlanta-sarutobi-solarwave-bound',
-  'disrupt-sasuke-dimension-shift',
-  'compression-zabuza-gravitational-waves',
-  'bream-hall-rocklee-tauzero',
-  'laflamme-uzumaki-galacticraft-fatherstretch',
-  'edchambers-kiba-curtainspace-bloodonleaves',
-  'decentralized-kankuro-sunspot-ultralightbeam',
-  'fooman-minato-axioms-diamonds',
-  'techcrunch-naruto-halointerpreter-spaceship',
-  'laurie-anko-evaporatingriver-lowlights',
-  'carver-hyuga-microuniverse-mrwest',
-  'chuyan-woodstyle-lostinspace-mercy'
-]
-
+VALID_PASSKEYS = list(PASSKEYS.keys())
 COST_PER_TOKEN = 0.000002
 
 def delete_user_message_history(passkey: str):
