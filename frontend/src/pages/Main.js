@@ -149,10 +149,10 @@ function Main() {
                   y2="-26.3838"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop stop-color="#FFFFFF" />
+                  <stop stop-color="#D3D3D3" />
                   <stop
                     offset="0.192708"
-                    stop-color="#FFFFFF"
+                    stop-color="#D3D3D3"
                     stop-opacity="0.65625"
                   />
                   <stop offset="0.515625" stop-color="#000000" />
