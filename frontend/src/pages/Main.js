@@ -1,110 +1,189 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Passkey from './Passkey';
-import MessageHistory from './MessageHistory';
-import Modal from 'react-modal';
-import usePasskey from '../usePasskey';
+import React, { useState, useEffect, useRef } from "react";
+import Passkey from "./Passkey";
+import MessageHistory from "./MessageHistory";
+import Modal from "react-modal";
+import usePasskey from "../usePasskey";
+import VoiceRecorderButton from "./VoiceRecorderButton";
+import PlayAudioButton from "./PlayAudioButton";
 
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
-function Main () {
+function Main() {
   const inputRef = useRef(null);
   const [data, setData] = useState("");
   const [passkey, setPasskey] = usePasskey(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
+  const [receivedAudio, setReceivedAudio] = useState(null);
+  const [audioButtonHidden, setAudioButtonHidden] = useState(true);
 
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
   };
 
+  const handleTranscription = (transcript) => {
+    inputRef.current.value += transcript;
+    inputRef.current.selectionStart = inputRef.current.selectionEnd =
+      inputRef.current.value.length;
+    inputRef.current.scrollLeft = inputRef.current.scrollWidth;
+    inputRef.current.scrollTop = inputRef.current.scrollHeight;
+  };
+
   const handleSubmit = async (event) => {
-    setLoading(true)
+    setLoading(true);
+    setAudioButtonHidden(true);
     const input = inputRef.current.value;
     inputRef.current.value = "";
     event.preventDefault();
-    const resp = await fetch(process.env.REACT_APP_API_ROOT + '/therapize', {
-      method: 'POST',
+    
+    const resp = await fetch(process.env.REACT_APP_API_ROOT + "/therapize", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({passkey, input, message_history: messageHistory}),
-    })
+      body: JSON.stringify({ passkey, input, message_history: messageHistory }),
+    });
 
-    const response = await resp.json()
-    let data = response["message"]
+    const response = await resp.json();
+    let responseData = response["message"];
     // console.log(data)
-    setMessageHistory(data["message_history"])
-    setData(data["therapist_response"])
+    
 
-    setLoading(false)
-  }
+    const resp2 = await fetch(process.env.REACT_APP_API_ROOT + "/get-audio", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({text: responseData["therapist_response"]}),
+    });
+    const blob = await resp2.blob();
+    const audioURL = URL.createObjectURL(blob);
+    setReceivedAudio(audioURL);
+    
+    setMessageHistory(responseData["message_history"]);
+    setData(responseData["therapist_response"]);
+
+    setLoading(false);
+    setAudioButtonHidden(false);
+  };
 
   const deleteAllData = async () => {
-    setLoading(true)
-    const response = await fetch(process.env.REACT_APP_API_ROOT + '/delete-all-data', {
-        method: 'POST',
+    setLoading(true);
+    const response = await fetch(
+      process.env.REACT_APP_API_ROOT + "/delete-all-data",
+      {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({passkey}),
-    })
-    
-    setLoading(false)
-    if (response.ok) {
-        alert("All data deleted!")
-    }
-    else {
-        alert("Error deleting data!")
-    }
+        body: JSON.stringify({ passkey }),
+      }
+    );
 
-  }
+    setLoading(false);
+    if (response.ok) {
+      alert("All data deleted!");
+    } else {
+      alert("Error deleting data!");
+    }
+  };
 
   if (passkey === null || passkey === "" || passkey === undefined) {
-    return (<Passkey/>)
+    return <Passkey />;
   }
 
   return (
-      <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
-        <div className= " text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 mb-4 font-bold">How are you, really?</div>
-        <input
-          className="w-3/4 md:w-1/3 h-16 pl-4 bg-white placeholder:text-slate-400 rounded-md font-gilroy text-md border-2 border-slate-500"
-          placeholder="im upset"
-          type="text"
+    <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
+      <div className="text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 mb-4 font-bold">
+        How are you, really?
+      </div>
+        <textarea
+          id="message"
+          rows="4"
           ref={inputRef}
+          class="block p-2.5 w-3/4 md:w-1/3 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="im upset"
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
+            if (event.key === "Enter") {
               handleSubmit(event);
             }
           }}
+        ></textarea>
+      <VoiceRecorderButton
+          onTranscribe={handleTranscription}
         />
-        <button
-          className={"rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"}
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          Submit
-        </button>
-        {loading && <div id="loading-spinner" className="self-center text-center">
+      <button
+        className={
+          "rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"
+        }
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        Submit
+      </button>
+      {loading && (
+        <div id="loading-spinner" className="self-center text-center">
           <div role="status">
-            <svg width="100" height="100" className="animate-spin" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="25" stroke="url(#paint0_linear_451_5786)" stroke-width="10"/>
+            <svg
+              width="100"
+              height="100"
+              className="animate-spin"
+              viewBox="0 0 100 100"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="50"
+                cy="50"
+                r="25"
+                stroke="url(#paint0_linear_451_5786)"
+                stroke-width="10"
+              />
               <defs>
-              <linearGradient id="paint0_linear_451_5786" x1="8.21168" y1="-32.8948" x2="146.326" y2="-26.3838" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#F55E54"/>
-              <stop offset="0.192708" stop-color="#FFC632" stop-opacity="0.65625"/>
-              <stop offset="0.515625" stop-color="#48FF2B"/>
-              <stop offset="0.770833" stop-color="#1720F3" stop-opacity="0.99"/>
-              <stop offset="0.953125" stop-color="#B82AAA"/>
-              </linearGradient>
+                <linearGradient
+                  id="paint0_linear_451_5786"
+                  x1="8.21168"
+                  y1="-32.8948"
+                  x2="146.326"
+                  y2="-26.3838"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-color="#FFFFFF" />
+                  <stop
+                    offset="0.192708"
+                    stop-color="#FFFFFF"
+                    stop-opacity="0.65625"
+                  />
+                  <stop offset="0.515625" stop-color="#000000" />
+                  <stop
+                    offset="0.770833"
+                    stop-color="#000000"
+                    stop-opacity="0.99"
+                  />
+                  <stop offset="0.953125" stop-color="#B82AAA" />
+                </linearGradient>
               </defs>
             </svg>
           </div>
-        </div>}
-        {/* {data && !loading && <><p className="mt-4 w-5/6 md:w-1/2 h-1/5 md:h-2/5 text-center text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">{data}</p><div className="text-center text-xs">Scroll for more ↓</div></>} */}
-        {data && !loading && <><p className="mt-4 w-1/2 md:w-1/4 h-1/12 md:h-1/6 text-center text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">{data}</p><div className="text-center text-xs">Scroll for more ↓</div></>}
-        <button className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4" onClick={deleteAllData}>Delete all my chat data</button>
-        <button
+        </div>
+      )}
+      {data && !loading && (
+        <>
+          <p className="mt-4 h-2/5 md:h-1/2 w-3/4 md:w-1/3 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">
+            {data}
+          </p>
+          {/* <div className="text-center text-xs">Scroll for more ↓</div> */}
+        </>
+      )}
+      {receivedAudio && <PlayAudioButton hidden={audioButtonHidden} audio={receivedAudio} />}
+      <button
+        className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
+        onClick={deleteAllData}
+      >
+        Delete all my chat data
+      </button>
+      <button
         className="text-black font-gilroy absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
         onClick={toggleHistoryModal}
       >
@@ -118,9 +197,8 @@ function Main () {
       >
         <MessageHistory messageHistory={messageHistory} />
       </Modal>
-      </div>
-  )
-
+    </div>
+  );
 }
 
 export default Main;
