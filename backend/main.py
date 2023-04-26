@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 from flask_cors import CORS
 import json
 from dotenv import load_dotenv
@@ -6,6 +6,7 @@ from posthog import Posthog
 
             
 from prompts import therapy_prompt
+from audio import get_audio_from_text
 from db import USERS, PROMPTS
 from passkeys import PASSKEYS
 
@@ -195,6 +196,24 @@ def message_history_route():
     status=status,
     mimetype=mimetype
   )
+
+@app.route('/get-audio', methods=['POST'])
+def get_audio():
+  status = 0
+  try:
+    #Parse json request
+    req_json = request.get_json()
+    print(req_json)
+    text = req_json['text']
+    audio_data = get_audio_from_text(text)
+
+    status = 200
+    return Response(audio_data, status=status, content_type='audio/mpeg')
+  except Exception as e:
+    status = 400
+    return Response(f"Server error: {e}", status=status)
+    
+  
 
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=PORT, debug=True)
