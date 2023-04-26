@@ -211,6 +211,7 @@ def get_audio():
     return Response(audio_data, status=status, content_type='audio/mpeg')
   except Exception as e:
     status = 400
+    print(e)
     return Response(f"Server error: {e}", status=status)
     
   
