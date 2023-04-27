@@ -17,6 +17,7 @@ function Main() {
   const [messageHistory, setMessageHistory] = useState([]);
   const [receivedAudio, setReceivedAudio] = useState(null);
   const [audioButtonHidden, setAudioButtonHidden] = useState(true);
+  const [buttonText, setButtonText] = useState('Delete all my chat data');
 
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
@@ -69,7 +70,6 @@ function Main() {
   };
 
   const deleteAllData = async () => {
-    setLoading(true);
     const response = await fetch(
       process.env.REACT_APP_API_ROOT + "/delete-all-data",
       {
@@ -81,12 +81,16 @@ function Main() {
       }
     );
 
-    setLoading(false);
     if (response.ok) {
-      alert("All data deleted!");
+      setButtonText("Deleted data!");
     } else {
-      alert("Error deleting data!");
+      setButtonText("Error, try again.");
     }
+
+    // Reset button text after 3 seconds
+    setTimeout(() => {
+      setButtonText("Delete all my chat data");
+    }, 2000);
   };
 
   if (passkey === null || passkey === "" || passkey === undefined) {
@@ -181,7 +185,7 @@ function Main() {
         className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
         onClick={deleteAllData}
       >
-        Delete all my chat data
+        {buttonText}
       </button>
       <button
         className="text-black font-gilroy absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"

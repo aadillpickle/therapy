@@ -42,7 +42,7 @@ def therapy(passkey, user_input: dict, message_history: list):
   completion = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=message_history,
-    max_tokens=123,
+    max_tokens=256,
   )
 
   response = completion.choices[0].message.content
