@@ -43,7 +43,7 @@ function Main() {
       body: JSON.stringify({ email: userInfo.email }),
     });
     const response = await resp.json();
-    setCredits(response["credits"]);
+    setCredits(response["message"]);
   };
 
   const handleSubmit = async (event) => {
