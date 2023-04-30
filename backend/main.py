@@ -40,6 +40,8 @@ def therapize_route():
     input = req_json['input'] if 'input' in req_json else None
     message_history = req_json['message_history']
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') if 'HTTP_X_FORWARDED_FOR' in request.environ else request.headers.get('X-Forwarded-For')
+    if input == "":
+       raise Exception("Input cannot be empty. Please try again.")
     if email:
         user = USERS.find_one({"email": email})
         if user:
