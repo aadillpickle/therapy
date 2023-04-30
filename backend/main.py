@@ -39,6 +39,11 @@ def therapize_route():
     email = req_json['email'] if 'email' in req_json else None
     input = req_json['input'] if 'input' in req_json else None
     message_history = req_json['message_history']
+    print(request.environ['REMOTE_ADDR']) if 'REMOTE_ADDR' in request.environ else 'nothing in remote addr'
+    print(request.environ['HTTP_X_FORWARDED_FOR']) if 'HTTP_X_FORWARDED_FOR' in request.environ else 'nothing in x forwarded for'
+    print(request.environ['HTTP_CLIENT_IP']) if 'HTTP_CLIENT_IP' in request.environ else 'nothing in client ip'
+    print(request.environ['HTTP_X_REAL_IP']) if 'HTTP_X_REAL_IP' in request.environ else 'nothing in x real ip'
+    
     ip = request.remote_addr
     if email:
         user = USERS.find_one({"email": email})
@@ -59,10 +64,7 @@ def therapize_route():
             raise Exception("Not enough credits")
             
     user = USERS.find_one({"ip": ip})
-    # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-    #     print(request.environ['REMOTE_ADDR'])
-    # else:
-    #     print(request.environ['HTTP_X_FORWARDED_FOR']) # if behind a proxy
+    
 
     if not user:
       user = create_new_user(ip, email)
@@ -162,8 +164,30 @@ def get_audio():
     status = 400
     print(e)
     return Response(f"Server error: {e}", status=status)
-    
 
+@app.route('/credits', methods=['POST'])
+def credits_route():
+  #Sample response attributes
+  response_object = {}
+  mimetype="application/json"
+  status = 0
+
+  try:
+    #Parse json request
+    req_json = request.get_json()
+    email = req_json['email']
+    user = USERS.find_one({'email': email})
+    response_object["message"] = user['credits']
+    status = 200
+  except Exception as e:
+    response_object["message"] = f"Server error: {e}"
+    status = 400
+
+  return Response(
+    json.dumps(response_object),
+    status=status,
+    mimetype=mimetype
+  )
 
 @app.route('/webhook', methods=['POST'])
 def webhook():

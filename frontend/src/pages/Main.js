@@ -20,6 +20,7 @@ function Main() {
   const [audioButtonHidden, setAudioButtonHidden] = useState(true);
   const [buttonText, setButtonText] = useState('Delete all my chat data');
   const [userInfo, setUserInfo] = useUserInfo('userInfo');
+  const [credits, setCredits] = useState(0);
 
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
@@ -31,6 +32,18 @@ function Main() {
       inputRef.current.value.length;
     inputRef.current.scrollLeft = inputRef.current.scrollWidth;
     inputRef.current.scrollTop = inputRef.current.scrollHeight;
+  };
+
+  const getCredits = async () => {
+    const resp = await fetch(process.env.REACT_APP_API_ROOT + "/credits", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: userInfo.email }),
+    });
+    const response = await resp.json();
+    setCredits(response["credits"]);
   };
 
   const handleSubmit = async (event) => {
@@ -148,7 +161,7 @@ function Main() {
       </button>
       <button
         className="text-black font-gilroy absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
-        onClick={toggleHistoryModal}
+        onClick={() => {toggleHistoryModal(); getCredits();}}
       >
         Show chat history
       </button>
@@ -161,7 +174,7 @@ function Main() {
         className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto mt-10"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center"
       >
-        <MessageHistory messageHistory={messageHistory} />
+        <MessageHistory messageHistory={messageHistory} credits={credits} />
       </Modal>
     </div>
   );

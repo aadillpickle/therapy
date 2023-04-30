@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-const MessageHistory = (messageHistory) => {
+const MessageHistory = (messageHistory, credits) => {
   messageHistory = messageHistory.messageHistory;
   if (messageHistory.length === 0) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto">
         <h2 className="text-xl font-bold mb-4">Message History</h2>
         <p className="text-gray-500">No messages yet</p>
+        <p className="text-gray-500 text-center">You have {credits} credits</p>
       </div>
     );
   }
@@ -26,6 +27,7 @@ const MessageHistory = (messageHistory) => {
           );
         })}
         </div>
+        <p className="text-gray-500 text-center">You have {credits} credits</p>
       </div>
     );
   }
