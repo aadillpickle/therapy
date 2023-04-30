@@ -39,10 +39,11 @@ def therapize_route():
     email = req_json['email'] if 'email' in req_json else None
     input = req_json['input'] if 'input' in req_json else None
     message_history = req_json['message_history']
-    print(request.environ['REMOTE_ADDR']) if 'REMOTE_ADDR' in request.environ else 'nothing in remote addr'
-    print(request.environ['HTTP_X_FORWARDED_FOR']) if 'HTTP_X_FORWARDED_FOR' in request.environ else 'nothing in x forwarded for'
-    print(request.environ['HTTP_CLIENT_IP']) if 'HTTP_CLIENT_IP' in request.environ else 'nothing in client ip'
-    print(request.environ['HTTP_X_REAL_IP']) if 'HTTP_X_REAL_IP' in request.environ else 'nothing in x real ip'
+    print(request.environ['REMOTE_ADDR']) if 'REMOTE_ADDR' in request.environ else  print('nothing in remote addr')
+    print(request.environ['HTTP_X_FORWARDED_FOR']) if 'HTTP_X_FORWARDED_FOR' in request.environ else  print('nothing in x forwarded for')
+    print(request.environ['HTTP_CLIENT_IP']) if 'HTTP_CLIENT_IP' in request.environ else  print('nothing in client ip')
+    print(request.environ['HTTP_X_REAL_IP']) if 'HTTP_X_REAL_IP' in request.environ else print('nothing in x real ip')
+    print(request.headers.get('X-Forwarded-For')) if 'X-Forwarded-For' in request.headers else print('nothing in x forwarded for')
     
     ip = request.remote_addr
     if email:
