@@ -1,14 +1,13 @@
 from flask import Flask, request, Response, jsonify
 from flask_cors import CORS
+import stripe
+
 import json
 from dotenv import load_dotenv
 from posthog import Posthog
-
-            
-from prompts import therapy_prompt
+from therapist import create_new_user, therapize, add_email_and_credits
 from audio import get_audio_from_text
-from db import USERS, PROMPTS
-from passkeys import PASSKEYS
+from db import USERS, PROMPTS, delete_user_message_history, store_usage, add_credits
 
 import os
 import openai
@@ -16,6 +15,7 @@ import openai
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 posthog = Posthog(project_api_key=os.environ.get('POSTHOG_API_KEY'), host='https://app.posthog.com')
 
 app = Flask(__name__)
@@ -23,72 +23,69 @@ CORS(app)
 
 PORT = os.environ.get('PORT', 8000)
 
-VALID_PASSKEYS = list(PASSKEYS.keys())
-COST_PER_TOKEN = 0.000002
-
-def delete_user_message_history(passkey: str):
-  USERS.find_one_and_update({'passkey': passkey},
-      {
-          '$set': {'message_history': []}
-      }
-  )
-
-def therapy(passkey, user_input: dict, message_history: list):
-  if message_history == []:
-    message_history.append({"role": "system", "content": therapy_prompt()})
-  user_input = {"role": "user", "content": user_input}
-  message_history.append(user_input)
-
-  completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=message_history,
-    max_tokens=256,
-  )
-
-  response = completion.choices[0].message.content
-  usage = completion.usage["total_tokens"]
-  print(completion.usage)
-  therapist_response = {"role": "assistant", "content": response}
-  message_history.append(therapist_response)
-  store_usage(passkey, usage, [user_input, therapist_response])
-  posthog.capture(passkey, 'chat message')
-  return {"therapist_response": response, "message_history": message_history}
-
-def store_usage(passkey: str, token_amount: int, new_messages: list):  
-    
-    USERS.find_one_and_update({'passkey': passkey},
-        {
-            '$push': {'message_history': new_messages},
-            '$inc': {'token_usage': token_amount, 'total_cost': token_amount * COST_PER_TOKEN}
-        },
-        upsert=True
-    )
-    
 @app.route('/', methods=['GET'])
 def index():
 	return '<h1>Server is running</h1>'
 
 @app.route('/therapize', methods=['POST'])
-def create_user_route():
-  #Sample response attributes
+def therapize_route():
   response_object = {}
   mimetype="application/json"
   status = 0
 
   try:
-    
     #Parse json request
     req_json = request.get_json()
-    input = req_json['input']
+    email = req_json['email'] if 'email' in req_json else None
+    input = req_json['input'] if 'input' in req_json else None
     message_history = req_json['message_history']
-    passkey = req_json['passkey']
-    
-    if passkey in VALID_PASSKEYS:
-      response_object["message"] = therapy(passkey, input, message_history)
-    else:
-      raise Exception("Invalid password")
+    ip = request.remote_addr
+    if email:
+        user = USERS.find_one({"email": email})
+        if user:
+          if user["credits"] > 0:
+            resp_msg, msg_hist, token_amount, conversation = therapize(input, message_history) #err here
+            store_usage(token_amount, conversation, email=email)
+            response_object["message"] = {"therapist_response": resp_msg, "message_history": msg_hist}  
+            status = 200
+            posthog.capture(email, 'chat message')
+            return Response(
+              json.dumps(response_object),
+              status=status,
+              mimetype=mimetype
+          )
+          else:
+            status = 402
+            raise Exception("Not enough credits")
+            
+    user = USERS.find_one({"ip": ip})
+    # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+    #     print(request.environ['REMOTE_ADDR'])
+    # else:
+    #     print(request.environ['HTTP_X_FORWARDED_FOR']) # if behind a proxy
 
-    status = 200
+    if not user:
+      user = create_new_user(ip, email)
+
+    if email and not user.get("email"):
+        user = add_email_and_credits(user, email)
+
+    if user["credits"] > 0:
+        resp_msg, msg_hist, token_amount, conversation = therapize(input, message_history)
+        store_usage(token_amount, conversation, ip=ip)
+        response_object["message"] = {"therapist_response": resp_msg, "message_history": msg_hist}
+        status = 200
+        posthog.capture(ip, 'chat message')
+        return Response(
+          json.dumps(response_object),
+          status=status,
+          mimetype=mimetype
+        )
+    else:
+      status = 402
+      raise Exception("Not enough credits. Please make an account for 10 more free credits or log in if you already have an account.")
+
+
   except Exception as e:
     response_object["message"] = f"Server error: {e}"
     status = 400
@@ -98,39 +95,7 @@ def create_user_route():
     status=status,
     mimetype=mimetype
   )
-
-@app.route('/validate-passkey', methods=['POST'])
-def validate_passkey_route():
-  #Sample response attributes
-  response_object = {}
-  mimetype="application/json"
-  status = 0
-
-  try:
-    #Parse json request
-    req_json = request.get_json()
-    print(req_json)
-    passkey = req_json['passkey']
-    
-    #extract anonymous id from posthog cookie
-    # posthog_cookie = request.cookies.get('ph_')
-    if passkey in VALID_PASSKEYS:
-      posthog.capture(passkey, 'validated')
-      response_object["message"] = "Valid passkey"
-    else:
-      raise Exception("Invalid passkey")
-
-    status = 200
-  except Exception as e:
-    response_object["message"] = f"Server error: {e}"
-    status = 400
-
-  return Response(
-    json.dumps(response_object),
-    status=status,
-    mimetype=mimetype
-  )
-
+     
 @app.route('/delete-all-data', methods=['POST'])
 def delete_all_data_route():
   #Sample response attributes
@@ -141,17 +106,11 @@ def delete_all_data_route():
   try:
     #Parse json request
     req_json = request.get_json()
-    print(req_json)
-    passkey = req_json['passkey']
+    email = req_json['email']
     
-    #extract anonymous id from posthog cookie
-    # posthog_cookie = request.cookies.get('ph_')
-    if passkey in VALID_PASSKEYS:
-      posthog.capture(passkey, 'deleted chat data')
-      delete_user_message_history(passkey)
-      response_object["message"] = "Deleted all data"
-    else:
-      raise Exception("Invalid passkey")
+    posthog.capture(email, 'deleted chat data')
+    delete_user_message_history(email)
+    response_object["message"] = "Deleted all data"
 
     status = 200
   except Exception as e:
@@ -174,18 +133,10 @@ def message_history_route():
   try:
     #Parse json request
     req_json = request.get_json()
-    print(req_json)
-    passkey = req_json['passkey']
-    
-    #extract anonymous id from posthog cookie
-    # posthog_cookie = request.cookies.get('ph_')
-    if passkey in VALID_PASSKEYS:
-      posthog.capture(passkey, 'retrieved chat data')
-      user = USERS.find_one({'passkey': passkey})
-      response_object["message"] = user['message_history'][-1:]#last 20
-    else:
-      raise Exception("Invalid passkey")
-
+    email = req_json['email']
+    posthog.capture(email, 'retrieved chat data')
+    user = USERS.find_one({'email': email})
+    response_object["message"] = user['message_history'][-1:]
     status = 200
   except Exception as e:
     response_object["message"] = f"Server error: {e}"
@@ -201,9 +152,7 @@ def message_history_route():
 def get_audio():
   status = 0
   try:
-    #Parse json request
     req_json = request.get_json()
-    print(req_json)
     text = req_json['text']
     audio_data = get_audio_from_text(text)
 
@@ -214,7 +163,31 @@ def get_audio():
     print(e)
     return Response(f"Server error: {e}", status=status)
     
-  
+
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    payload = request.data
+    sig_header = request.headers.get('stripe-signature')
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, os.getenv("STRIPE_WEBHOOK_SECRET"))
+    except ValueError as e:
+        # Invalid payload
+        return 'Invalid payload', 400
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return 'Invalid signature', 400
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        customer_email = session["customer_details"]["email"]
+        user = add_credits(customer_email)
+        posthog.capture(customer_email, 'purchased credits')
+        print(user["credits"])
+        
+    return 'Success', 200
 
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=PORT, debug=True)

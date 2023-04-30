@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import usePasskey from '../usePasskey';
 
 const MessageHistory = (messageHistory) => {
   messageHistory = messageHistory.messageHistory;

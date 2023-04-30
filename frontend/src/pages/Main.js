@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import Passkey from "./Passkey";
+import GoogleLoginButton from "./GoogleLoginButton";
+import useUserInfo from '../useUserInfo';
+import LoadingSpinner from "../LoadingSpinner";
+import Credits from "./Credits";
 import MessageHistory from "./MessageHistory";
 import Modal from "react-modal";
-import usePasskey from "../usePasskey";
 import VoiceRecorderButton from "./VoiceRecorderButton";
 import PlayAudioButton from "./PlayAudioButton";
 
@@ -11,13 +13,13 @@ Modal.setAppElement("#root");
 function Main() {
   const inputRef = useRef(null);
   const [data, setData] = useState("");
-  const [passkey, setPasskey] = usePasskey(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
   const [receivedAudio, setReceivedAudio] = useState(null);
   const [audioButtonHidden, setAudioButtonHidden] = useState(true);
   const [buttonText, setButtonText] = useState('Delete all my chat data');
+  const [userInfo, setUserInfo] = useUserInfo('userInfo');
 
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
@@ -37,36 +39,42 @@ function Main() {
     const input = inputRef.current.value;
     inputRef.current.value = "";
     event.preventDefault();
-    
+    const requestParams = {input, message_history: messageHistory};
+    if (userInfo.email)
+    {
+      requestParams['email'] = userInfo.email;
+    }
+   
     const resp = await fetch(process.env.REACT_APP_API_ROOT + "/therapize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ passkey, input, message_history: messageHistory }),
+      body: JSON.stringify(requestParams),
     });
 
     const response = await resp.json();
     let responseData = response["message"];
-    // console.log(data)
     
-
-    const resp2 = await fetch(process.env.REACT_APP_API_ROOT + "/get-audio", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({text: responseData["therapist_response"]}),
-    });
-    const blob = await resp2.blob();
-    const audioURL = URL.createObjectURL(blob);
-    setReceivedAudio(audioURL);
-    
-    setMessageHistory(responseData["message_history"]);
-    setData(responseData["therapist_response"]);
-
+    if (responseData["therapist_response"]) {
+      const resp2 = await fetch(process.env.REACT_APP_API_ROOT + "/get-audio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({text: responseData["therapist_response"]}),
+      });
+      const blob = await resp2.blob();
+      const audioURL = URL.createObjectURL(blob);
+      setReceivedAudio(audioURL);
+      
+      setMessageHistory(responseData["message_history"]);
+      setData(responseData["therapist_response"]);
+      setAudioButtonHidden(false);
+    } else {
+      setData(responseData)
+    }
     setLoading(false);
-    setAudioButtonHidden(false);
   };
 
   const deleteAllData = async () => {
@@ -77,7 +85,7 @@ function Main() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ passkey }),
+        body: JSON.stringify({ email: userInfo.email }),
       }
     );
 
@@ -92,11 +100,6 @@ function Main() {
       setButtonText("Delete all my chat data");
     }, 2000);
   };
-
-  if (passkey === null || passkey === "" || passkey === undefined) {
-    return <Passkey />;
-  }
-
   return (
     <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
       <div className="text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 mb-4 font-bold">
@@ -106,6 +109,7 @@ function Main() {
           id="message"
           rows="4"
           ref={inputRef}
+          maxLength={625}
           class="block p-2.5 w-3/4 md:w-1/3 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
           placeholder="im upset"
           onKeyDown={(event) => {
@@ -126,52 +130,7 @@ function Main() {
       >
         Submit
       </button>
-      {loading && (
-        <div id="loading-spinner" className="self-center text-center">
-          <div role="status">
-            <svg
-              width="100"
-              height="100"
-              className="animate-spin"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="50"
-                cy="50"
-                r="25"
-                stroke="url(#paint0_linear_451_5786)"
-                stroke-width="10"
-              />
-              <defs>
-                <linearGradient
-                  id="paint0_linear_451_5786"
-                  x1="8.21168"
-                  y1="-32.8948"
-                  x2="146.326"
-                  y2="-26.3838"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stop-color="#D3D3D3" />
-                  <stop
-                    offset="0.192708"
-                    stop-color="#D3D3D3"
-                    stop-opacity="0.65625"
-                  />
-                  <stop offset="0.515625" stop-color="#000000" />
-                  <stop
-                    offset="0.770833"
-                    stop-color="#000000"
-                    stop-opacity="0.99"
-                  />
-                  <stop offset="0.953125" stop-color="#B82AAA" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
-      )}
+      {loading && (<LoadingSpinner/>)}
       {data && !loading && (
         <>
           <p className="mt-4 h-2/5 md:h-1/2 w-3/4 md:w-1/3 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">
@@ -181,7 +140,7 @@ function Main() {
         </>
       )}
       {receivedAudio && <PlayAudioButton hidden={audioButtonHidden} audio={receivedAudio} />}
-      <button
+      {userInfo.email && <><button
         className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
         onClick={deleteAllData}
       >
@@ -193,6 +152,9 @@ function Main() {
       >
         Show chat history
       </button>
+      <Credits/>
+      </>}
+      {!userInfo.email && <GoogleLoginButton styling={'absolute top-0 right-0'} />}
       <Modal
         isOpen={isHistoryModalOpen}
         onRequestClose={toggleHistoryModal}
