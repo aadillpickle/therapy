@@ -167,7 +167,10 @@ function Main() {
       </button>
       <Credits/>
       </>}
-      {!userInfo.email && <GoogleLoginButton styling={'absolute top-0 right-0'} />}
+      {!userInfo.email && <>
+        <GoogleLoginButton />
+        <div className="text-sm font-gilroy text-center">Make an account for 10 bonus credits <br></br> and access to premium features!</div>
+      </>}
       <Modal
         isOpen={isHistoryModalOpen}
         onRequestClose={toggleHistoryModal}
