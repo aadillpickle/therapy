@@ -18,8 +18,8 @@ def therapize(user_input: dict, message_history: list):
     print(message_history)
     if message_history == []:
         message_history.append({"role": "system", "content": therapy_prompt()})
-        user_input = {"role": "user", "content": user_input}
         
+    user_input = {"role": "user", "content": user_input}    
     message_history.append(user_input)
 
     completion = openai.ChatCompletion.create(
