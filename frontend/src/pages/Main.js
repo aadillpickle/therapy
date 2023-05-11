@@ -146,7 +146,7 @@ function Main() {
       {loading && (<LoadingSpinner/>)}
       {data && !loading && (
         <>
-          <p className="mt-4 h-2/5 md:h-1/2 w-3/4 md:w-1/3 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">
+          <p className="mt-4 min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">
             {data}
           </p>
           {/* <div className="text-center text-xs">Scroll for more ↓</div> */}
