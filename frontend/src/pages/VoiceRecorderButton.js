@@ -44,16 +44,19 @@ const VoiceRecorderButton = ({ onTranscribe }) => {
   };
 
   return (
-    <button
-      onClick={handleButtonClick}
-      className={`flex items-center justify-center text-white px-4 py-2 rounded-lg focus:outline-none transition-colors ${
-        isRecording ? 'bg-green-400' : 'bg-red-600'
-      }`}
-    >
-      <span className="material-icons">
-        {isRecording ? 'mic' : 'mic_off'}
-      </span>
-    </button>
+    <>
+      <button
+        onClick={handleButtonClick}
+        className={`flex items-center justify-center text-white px-4 py-2 rounded-lg focus:outline-none transition-colors ${
+          isRecording ? 'bg-green-400' : 'bg-red-600'
+        }`}
+      >
+        <span className="material-icons">
+          {isRecording ? 'mic' : 'mic_off'}
+        </span>
+      </button>
+      <p className="text-xs text-center">{isRecording ? "Press to stop recording" : "Press to start recording a message for Tori"} </p>
+    </>
   );
 };
 

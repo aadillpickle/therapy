@@ -132,8 +132,8 @@ function Main() {
           }}
         ></textarea>
       <VoiceRecorderButton
-          onTranscribe={handleTranscription}
-        />
+        onTranscribe={handleTranscription}
+      />
       <button
         className={
           "rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"
@@ -169,7 +169,7 @@ function Main() {
       </>}
       {!userInfo.email && <>
         <GoogleLoginButton />
-        <div className="text-sm font-gilroy text-center">Make an account for 10 bonus credits <br></br> and access to premium features!</div>
+        <div className="text-sm font-gilroy text-center">Make an account for 10 bonus credits (by default, you have 5)<br></br> and access to message history + future premium features!</div>
       </>}
       <Modal
         isOpen={isHistoryModalOpen}
