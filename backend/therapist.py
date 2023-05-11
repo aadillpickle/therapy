@@ -4,13 +4,13 @@ import openai
 COST_PER_TOKEN = 0.000002
 
 def create_new_user(ip: str, email: Optional[str] = None):
-    new_user = {"ip": ip, "email": email, "credits": 5}
+    new_user = {"ip": ip, "email": email, "credits": 10}
     USERS.insert_one(new_user)
     return new_user
 
 def add_email_and_credits(user, email: str):
     user["email"] = email
-    user["credits"] += 10
+    user["credits"] += 20
     USERS.update_one({"_id": user["_id"]}, {"$set": user})
     return user
 

@@ -142,7 +142,7 @@ function Main() {
       </>}
       {!userInfo.email && <>
         <GoogleLoginButton />
-        <div className="text-sm font-sans text-center">Make an account for 10 bonus credits (by default, you have 5)<br></br> and access to message history + future premium features!</div>
+        <div className="text-sm font-sans text-center">Make an account for 20 bonus credits (by default, you have 10)<br></br> and access to message history + future premium features!</div>
       </>}
       <Modal
         isOpen={isHistoryModalOpen}
