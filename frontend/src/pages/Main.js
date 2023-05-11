@@ -5,6 +5,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import Credits from "./Credits";
 import MessageHistory from "./MessageHistory";
 import Modal from "react-modal";
+import logo from "../assets/logo.png";
 
 Modal.setAppElement("#root");
 
@@ -89,8 +90,9 @@ function Main() {
     }, 2000);
   };
   return (
-    <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
-      <div className="text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 md:mb-2 font-bold">
+    <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4 bg-gradient-to-r from-[#5998F8] to-[#EDAFFC]">
+      <div className="absolute top-0 left-0"> <img src={logo} alt="TTT Logo" className="w-14 h-14 md:w-24 md:h-24 m-4" /></div>
+      <div className="text-xl text-white w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 md:mb-2">
         How are you, really?
       </div>
         <textarea
@@ -98,7 +100,7 @@ function Main() {
           rows="4"
           ref={inputRef}
           maxLength={625}
-          class="block p-2.5 w-3/4 md:w-1/3 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          class="block p-2.5 w-3/4 md:w-1/3 xl:w-1/4 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
           placeholder="im upset"
           onKeyDown={(event) => {
             if (event.key === "Enter") {
@@ -108,7 +110,7 @@ function Main() {
         ></textarea>
       <button
         className={
-          "rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"
+          "rounded-md text-slate-600 text-xl w-3/4 md:w-1/3 xl:w-1/4 h-16 bg-slate-200 border-2 border-slate-500 disabled:opacity-50"
         }
         onClick={handleSubmit}
         disabled={loading}
@@ -118,20 +120,20 @@ function Main() {
       {loading && (<LoadingSpinner/>)}
       {data && !loading && (
         <>
-          <p className="mt-4 min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-black border-2 border-slate-200 rounded-md">
+          <p className="mt-4 min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-white border-2 border-slate-200 rounded-md">
             {data}
           </p>
           {/* <div className="text-center text-xs">Scroll for more ↓</div> */}
         </>
       )}
       {userInfo.email && <><button
-        className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
+        className="text-white font-sans absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-200 rounded-lg p-4"
         onClick={deleteAllData}
       >
         {buttonText}
       </button>
       <button
-        className="text-black font-gilroy absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
+        className="text-white font-sans absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-200 rounded-lg p-4"
         onClick={() => {toggleHistoryModal(); getCredits();}}
       >
         Show chat history
@@ -140,7 +142,7 @@ function Main() {
       </>}
       {!userInfo.email && <>
         <GoogleLoginButton />
-        <div className="text-sm font-gilroy text-center">Make an account for 10 bonus credits (by default, you have 5)<br></br> and access to message history + future premium features!</div>
+        <div className="text-sm font-sans text-center">Make an account for 10 bonus credits (by default, you have 5)<br></br> and access to message history + future premium features!</div>
       </>}
       <Modal
         isOpen={isHistoryModalOpen}
