@@ -32,7 +32,7 @@ const Credits = () => {
   }
   return (
     <button
-      className="text-black font-gilroy absolute top-0 right-0 text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
+      className="text-black font-gilroy absolute top-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
       onClick={handleCheckout}
     >
       Buy credits

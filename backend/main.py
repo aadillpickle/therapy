@@ -6,7 +6,6 @@ import json
 from dotenv import load_dotenv
 from posthog import Posthog
 from therapist import create_new_user, therapize, add_email_and_credits
-from audio import get_audio_from_text
 from db import USERS, PROMPTS, delete_user_message_history, store_usage, add_credits
 
 import os
@@ -146,21 +145,6 @@ def message_history_route():
     status=status,
     mimetype=mimetype
   )
-
-@app.route('/get-audio', methods=['POST'])
-def get_audio():
-  status = 0
-  try:
-    req_json = request.get_json()
-    text = req_json['text']
-    audio_data = get_audio_from_text(text)
-
-    status = 200
-    return Response(audio_data, status=status, content_type='audio/mpeg')
-  except Exception as e:
-    status = 400
-    print(e)
-    return Response(f"Server error: {e}", status=status)
 
 @app.route('/credits', methods=['POST'])
 def credits_route():

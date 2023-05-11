@@ -5,8 +5,6 @@ import LoadingSpinner from "../LoadingSpinner";
 import Credits from "./Credits";
 import MessageHistory from "./MessageHistory";
 import Modal from "react-modal";
-import VoiceRecorderButton from "./VoiceRecorderButton";
-import PlayAudioButton from "./PlayAudioButton";
 
 Modal.setAppElement("#root");
 
@@ -16,22 +14,12 @@ function Main() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
-  const [receivedAudio, setReceivedAudio] = useState(null);
-  const [audioButtonHidden, setAudioButtonHidden] = useState(true);
   const [buttonText, setButtonText] = useState('Delete all my chat data');
   const [userInfo, setUserInfo] = useUserInfo('userInfo');
   const [credits, setCredits] = useState(0);
 
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
-  };
-
-  const handleTranscription = (transcript) => {
-    inputRef.current.value += transcript;
-    inputRef.current.selectionStart = inputRef.current.selectionEnd =
-      inputRef.current.value.length;
-    inputRef.current.scrollLeft = inputRef.current.scrollWidth;
-    inputRef.current.scrollTop = inputRef.current.scrollHeight;
   };
 
   const getCredits = async () => {
@@ -48,7 +36,6 @@ function Main() {
 
   const handleSubmit = async (event) => {
     setLoading(true);
-    setAudioButtonHidden(true);
     const input = inputRef.current.value;
     inputRef.current.value = "";
     event.preventDefault();
@@ -70,20 +57,8 @@ function Main() {
     let responseData = response["message"];
     
     if (responseData["therapist_response"]) {
-      const resp2 = await fetch(process.env.REACT_APP_API_ROOT + "/get-audio", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({text: responseData["therapist_response"]}),
-      });
-      const blob = await resp2.blob();
-      const audioURL = URL.createObjectURL(blob);
-      setReceivedAudio(audioURL);
-      
       setMessageHistory(responseData["message_history"]);
       setData(responseData["therapist_response"]);
-      setAudioButtonHidden(false);
     } else {
       setData(responseData)
     }
@@ -115,7 +90,7 @@ function Main() {
   };
   return (
     <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4">
-      <div className="text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 mb-4 font-bold">
+      <div className="text-lg w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 md:mb-2 font-bold">
         How are you, really?
       </div>
         <textarea
@@ -131,9 +106,6 @@ function Main() {
             }
           }}
         ></textarea>
-      <VoiceRecorderButton
-        onTranscribe={handleTranscription}
-      />
       <button
         className={
           "rounded-md text-lg w-3/4 md:w-1/3 h-16 text-white bg-slate-800 disabled:opacity-50"
@@ -152,7 +124,6 @@ function Main() {
           {/* <div className="text-center text-xs">Scroll for more ↓</div> */}
         </>
       )}
-      {receivedAudio && <PlayAudioButton hidden={audioButtonHidden} audio={receivedAudio} />}
       {userInfo.email && <><button
         className="text-black font-gilroy absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-600 rounded-lg p-4"
         onClick={deleteAllData}
