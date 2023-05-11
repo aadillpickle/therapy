@@ -20,7 +20,7 @@ def parse_json(data):
 def delete_user_message_history(email: str):
   USERS.find_one_and_update({'email': email},
       {
-          '$set': {'message_history': []}
+          '$set': {'message_history': [], "summary": ""}
       }
   )
 
