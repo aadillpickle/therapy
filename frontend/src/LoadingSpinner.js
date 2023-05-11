@@ -27,19 +27,19 @@ return(
             y2="-26.3838"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#D3D3D3" />
+            <stop stop-color="#1A5EFF" />
             <stop
               offset="0.192708"
-              stop-color="#D3D3D3"
+              stop-color="#1A5EFF"
               stop-opacity="0.65625"
             />
-            <stop offset="0.515625" stop-color="#000000" />
+            <stop offset="0.515625" stop-color="#F96AFA" />
             <stop
               offset="0.770833"
-              stop-color="#000000"
+              stop-color="#F96AFA"
               stop-opacity="0.99"
             />
-            <stop offset="0.953125" stop-color="#B82AAA" />
+            <stop offset="0.953125" stop-color="#F96AFA" />
           </linearGradient>
         </defs>
       </svg>
