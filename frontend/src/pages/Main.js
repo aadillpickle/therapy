@@ -5,6 +5,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import Credits from "./Credits";
 import MessageHistory from "./MessageHistory";
 import Modal from "react-modal";
+import logo from "../assets/logo.png";
 
 Modal.setAppElement("#root");
 
@@ -90,6 +91,7 @@ function Main() {
   };
   return (
     <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4 bg-gradient-to-r from-[#5998F8] to-[#EDAFFC]">
+      <div className="absolute top-0 left-0"> <img src={logo} alt="TTT Logo" className="w-14 h-14 md:w-24 md:h-24 m-4" /></div>
       <div className="text-xl text-white w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 md:mb-2">
         How are you, really?
       </div>
