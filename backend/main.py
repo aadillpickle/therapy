@@ -45,7 +45,7 @@ def therapize_route():
         user = USERS.find_one({"email": email})
         if user:
           if user["credits"] > 0:
-            resp_msg, msg_hist, token_amount, conversation = therapize(input, message_history) #err here
+            resp_msg, msg_hist, token_amount, conversation = therapize(input, message_history, email)
             store_usage(token_amount, conversation, email=email)
             response_object["message"] = {"therapist_response": resp_msg, "message_history": msg_hist}  
             status = 200
