@@ -33,11 +33,11 @@ def therapize(user_input: dict, message_history: list, email: Optional[str] = No
                 print("partial summary")
             user["summary"] = summary + user["summary"] if user.get("summary") else summary
             print(summary)
-            user["token_usage"] += usage
             user["total_cost"] += usage * COST_PER_TOKEN
             if len(user["summary"]) > 4000:
-                user["summary"] = summarize_summary(user["summary"])
+                user["summary"], summary_usage = summarize_summary(user["summary"])
                 print("summarized summary")
+                user["total_cost"] += summary_usage * COST_PER_TOKEN
             USERS.update_one({"_id": user["_id"]}, {"$set": user})
         
     completion = openai.ChatCompletion.create(
@@ -71,4 +71,4 @@ def summarize_summary(summary: str) -> str:
         messages=[{"role": "system", "content": f"Summarize the summary, while keeping emotional details, and key personal info. Return a single string.\n\nSummary:\n{summary}\n\nSummary of summary:",}],
         max_tokens=256,
     )
-    return summary.choices[0].message.content, summary.usage["total_characters"]
+    return summary.choices[0].message.content, summary.usage["total_tokens"]
