@@ -9,9 +9,6 @@ module.exports = {
         'amerigo': ['Amerigo BT', 'sans-serif'],
         'janna': ['Janna LT', 'sans-serif'],
       },
-      transitionProperty: {
-        'opacity': 'opacity',
-      },
     },
   },
   plugins: [],

@@ -27,6 +27,13 @@ function Main() {
   const [userInfo, setUserInfo] = useUserInfo('userInfo');
   const [credits, setCredits] = useState(0);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [isDataDisplayed, setIsDataDisplayed] = useState(false);
+
+  useEffect(() => {
+    if (data && !loading) {
+      setIsDataDisplayed(true);
+    }
+  }, [data, loading]);
 
   let stripePromise;
   const getStripe = () => {
@@ -76,6 +83,8 @@ function Main() {
 
   const handleSubmit = async (event) => {
     setLoading(true);
+    setData("");
+    setIsDataDisplayed(false);
     const input = inputRef.current.value;
     inputRef.current.value = "";
     event.preventDefault();
@@ -180,12 +189,10 @@ function Main() {
         
       </button>
       {loading && (<LoadingSpinner/>)}
-      {data && !loading && (
-        <>
-          <p className="mt-4 font-janna min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto whitespace-pre-wrap md:text-lg">
-            {data}
-          </p>
-        </>
+      {isDataDisplayed && (
+        <p className="mt-4 font-janna min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto whitespace-pre-wrap md:text-lg fade-in">
+          {data}
+        </p>
       )}
       {userInfo.email && (
         <>
