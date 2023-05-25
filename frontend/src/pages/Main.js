@@ -201,7 +201,7 @@ function Main() {
             onClick={() => {setIsHistoryModalOpen(false); toggleMenuModal();}}
           >
              <IconContext.Provider
-                value={{ color: '#C2D4BC', size: '48px'}}
+                value={{ color: '#ACB8A8', size: '48px'}}
               >
                 <div>
                 <IoEllipsisHorizontal />
@@ -225,6 +225,7 @@ function Main() {
       >
         <MessageHistory messageHistory={messageHistory} credits={credits} />
       </Modal>
+      <p className='text-xs text-janna absolute bottom-0 self-center text-center mb-4'>By talking to Tori, you are agreeing to our <a className="underline text-[#ACB8A8]"href="/legal">Terms</a>.</p>
     </div>
   );
 }
