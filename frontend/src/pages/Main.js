@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import GoogleLoginButton from "./GoogleLoginButton";
+import { IconContext } from "react-icons";
+
 import useUserInfo from '../useUserInfo';
+import { loadStripe } from "@stripe/stripe-js";
 import LoadingSpinner from "../LoadingSpinner";
-import Credits from "./Credits";
 import MessageHistory from "./MessageHistory";
 import Modal from "react-modal";
+import { IoEllipsisHorizontal } from "react-icons/io5";
+import { AiOutlineDelete } from 'react-icons/ai'; // Import any other icons you need
+import { MdPayment } from 'react-icons/md';
+import { BiMessageDetail } from 'react-icons/bi';
+import { BsArrowRight } from 'react-icons/bs';
 import logo from "../assets/logo.png";
+import MenuModal from './MenuModal';
 
 Modal.setAppElement("#root");
 
@@ -15,10 +23,25 @@ function Main() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
-  const [buttonText, setButtonText] = useState('Delete all my chat data');
+  const [deleteButtonText, setDeleteButtonText] = useState('Delete all chat data');
   const [userInfo, setUserInfo] = useUserInfo('userInfo');
   const [credits, setCredits] = useState(0);
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
 
+  let stripePromise;
+  const getStripe = () => {
+    if (!stripePromise) {
+      stripePromise = loadStripe(
+        `${process.env.REACT_APP_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
+      );
+    }
+    return stripePromise;
+  };
+
+  const toggleMenuModal = () => {
+    setIsMenuModalOpen(!isMenuModalOpen);
+  };
+  
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
   };
@@ -34,6 +57,22 @@ function Main() {
     const response = await resp.json();
     setCredits(response["message"]);
   };
+
+  async function handleCheckout() {
+    const stripe = await getStripe();
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [
+        {
+          price: process.env.REACT_APP_PUBLIC_STRIPE_PRICE_ID,
+          quantity: 1, // adjustable_quantity: {enabled: true, minimum: 1, maximum: 10}
+        },
+      ],
+      successUrl: `${process.env.REACT_APP_CURRENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${process.env.REACT_APP_CURRENT_URL}/cancel`,
+      customerEmail: userInfo.email,
+      mode: "payment",
+    });
+  }
 
   const handleSubmit = async (event) => {
     setLoading(true);
@@ -79,20 +118,36 @@ function Main() {
     );
 
     if (response.ok) {
-      setButtonText("Deleted data!");
+      setDeleteButtonText("Deleted data!");
     } else {
-      setButtonText("Error, try again.");
+      setDeleteButtonText("Error, try again.");
     }
-
-    // Reset button text after 3 seconds
     setTimeout(() => {
-      setButtonText("Delete all my chat data");
+      setDeleteButtonText("Delete all my chat data");
     }, 2000);
   };
+  const menuOptions = [
+    {
+      text: 'Buy more credits',
+      action: () => {handleCheckout()},
+      icon: () => <MdPayment />
+    },
+    {
+      text: 'Show chat history',
+      action: () => {toggleHistoryModal(); setIsMenuModalOpen(false); getCredits();},
+      icon: () => <BiMessageDetail />
+    },
+    {
+      text: deleteButtonText,
+      action: deleteAllData,
+      icon: () => <AiOutlineDelete />
+    },
+    
+  ];
   return (
-    <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4 bg-gradient-to-r from-[#5998F8] to-[#EDAFFC]">
-      <div className="absolute top-0 left-0"> <img src={logo} alt="TTT Logo" className="w-14 h-14 md:w-24 md:h-24 m-4" /></div>
-      <div className="text-xl text-white w-5/6 md:text-4xl md:w-1/3 text-center font-sans text-slate-700 md:mb-2">
+    <div className="bg-transparent w-full h-screen flex flex-col items-center mb-4 justify-center gap-4 bg-gradient-to-l from-[#EFDBF7] to-[#E8D0F0]">
+      {/* <div className="absolute top-0 left-0"> <img src={logo} alt="TTT Logo" className="w-14 h-14 md:w-24 md:h-24 m-4" /></div> */}
+      <div className="text-2xl font-amerigo text-slate-900 w-5/6 md:text-4xl md:w-1/3 text-center text-slate-700 md:mb-2">
         How are you, really?
       </div>
         <textarea
@@ -100,7 +155,7 @@ function Main() {
           rows="4"
           ref={inputRef}
           maxLength={625}
-          class="block p-2.5 w-3/4 md:w-1/3 xl:w-1/4 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          class="font-janna block p-2.5 w-3/4 md:w-1/3 xl:w-1/4 text-base text-slate-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
           placeholder="im upset"
           onKeyDown={(event) => {
             if (event.key === "Enter") {
@@ -110,45 +165,56 @@ function Main() {
         ></textarea>
       <button
         className={
-          "rounded-md text-slate-600 text-xl w-3/4 md:w-1/3 xl:w-1/4 h-16 bg-slate-200 border-2 border-slate-500 disabled:opacity-50"
+          "font-janna w-20 font-bold rounded-full bg-gradient-to-r from-[#E3F7DB] to-[#D8F0D0] p-4 disabled:opacity-50 flex items-center justify-center"
         }
         onClick={handleSubmit}
         disabled={loading}
       >
-        Submit
+        <IconContext.Provider
+          value={{ color: '#1E313B', size: '24px'}}
+        >
+          <div>
+            <BsArrowRight />
+          </div>
+        </IconContext.Provider>
+        
       </button>
       {loading && (<LoadingSpinner/>)}
       {data && !loading && (
         <>
-          <p className="mt-4 min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto p-4 whitespace-pre-wrap text-white border-2 border-slate-200 rounded-md">
+          <p className="mt-4 font-janna min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto whitespace-pre-wrap md:text-lg">
             {data}
           </p>
-          {/* <div className="text-center text-xs">Scroll for more ↓</div> */}
         </>
       )}
-      {userInfo.email && <><button
-        className="text-white font-sans absolute bottom-0 right-0 text-xs md:text-lg m-4 border-2 border-slate-200 rounded-lg p-4"
-        onClick={deleteAllData}
-      >
-        {buttonText}
-      </button>
-      <button
-        className="text-white font-sans absolute bottom-0 left-0 text-xs md:text-lg m-4 border-2 border-slate-200 rounded-lg p-4"
-        onClick={() => {toggleHistoryModal(); getCredits();}}
-      >
-        Show chat history
-      </button>
-      <Credits/>
-      </>}
-      {!userInfo.email && <>
-        <GoogleLoginButton />
-        <div className="text-sm font-sans text-center">Make an account for 10 bonus credits (by default, you have 5)<br></br> and access to message history + future premium features!</div>
-      </>}
+      {userInfo.email && (
+        <>
+          <button
+            className="absolute top-0 right-0 text-base md:text-2xl m-4 rounded-lg p-4 pr-6 md:pr-12"
+            onClick={() => {setIsHistoryModalOpen(false); toggleMenuModal();}}
+          >
+             <IconContext.Provider
+                value={{ color: '#C2D4BC', size: '48px'}}
+              >
+                <div>
+                <IoEllipsisHorizontal />
+                </div>
+            </IconContext.Provider>
+            
+          </button>
+
+          <MenuModal 
+            isOpen={isMenuModalOpen}
+            onRequestClose={toggleMenuModal}
+            menuOptions={menuOptions}
+          />
+        </>
+      )}
       <Modal
         isOpen={isHistoryModalOpen}
         onRequestClose={toggleHistoryModal}
         className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto mt-10"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end"
       >
         <MessageHistory messageHistory={messageHistory} credits={credits} />
       </Modal>

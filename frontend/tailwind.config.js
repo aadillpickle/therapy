@@ -6,7 +6,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Gilroy', 'sans-serif'],
+        'amerigo': ['Amerigo BT', 'sans-serif'],
+        'janna': ['Janna LT', 'sans-serif'],
+      },
+      transitionProperty: {
+        'opacity': 'opacity',
       },
     },
   },
