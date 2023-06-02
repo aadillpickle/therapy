@@ -137,7 +137,7 @@ function Main() {
   };
   const menuOptions = [
     {
-      text: 'Buy more credits',
+      text: 'Buy more messages',
       action: () => {handleCheckout()},
       icon: () => <MdPayment />
     },
@@ -188,6 +188,13 @@ function Main() {
         </IconContext.Provider>
         
       </button>
+      {!userInfo.email && 
+        <>
+         <GoogleLoginButton/>
+         <p className="font-janna text-xs text-center">Sign up for 10 more free messages, <br></br> chat history, long-term memory, and more!</p>
+        </>
+      }
+
       {loading && (<LoadingSpinner/>)}
       {isDataDisplayed && (
         <p className="mt-4 font-janna min-h-1/6 max-h-4/5 md:min-h-1/12 md:max-h-2/5 w-3/4 md:w-1/3 xl:w-1/4 text-center align-middle text-base overflow-auto whitespace-pre-wrap md:text-lg fade-in">
@@ -225,7 +232,7 @@ function Main() {
       >
         <MessageHistory messageHistory={messageHistory} credits={credits} />
       </Modal>
-      <p className='text-xs text-janna absolute bottom-0 self-center text-center mb-4'>By talking to Tori, you are agreeing to our <a className="underline text-[#ACB8A8]"href="/legal">Terms</a>.</p>
+      <p className='text-xs font-janna absolute bottom-0 self-center text-center mb-4'>By talking to Tori, you are agreeing to our <a className="underline text-[#ACB8A8]"href="/legal">Terms</a>.</p>
     </div>
   );
 }

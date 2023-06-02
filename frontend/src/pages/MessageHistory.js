@@ -6,7 +6,7 @@ const MessageHistory = ({messageHistory, credits}) => {
       <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto">
         <h2 className="text-xl font-bold mb-4">Message History</h2>
         <p className="text-gray-500">No messages yet</p>
-        <p className="text-gray-900 pt-2 text-center">You have {credits} credits left.</p>
+        <p className="text-gray-900 pt-2 text-center">You have {credits} messages left.</p>
       </div>
     );
   }
@@ -26,7 +26,7 @@ const MessageHistory = ({messageHistory, credits}) => {
           );
         })}
         </div>
-        <p className="text-gray-900 text-center">You have {credits} credits left.</p>
+        <p className="text-gray-900 text-center">You have {credits} messages left.</p>
       </div>
     );
   }
