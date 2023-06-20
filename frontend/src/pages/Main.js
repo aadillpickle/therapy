@@ -6,9 +6,10 @@ import useUserInfo from '../useUserInfo';
 import { loadStripe } from "@stripe/stripe-js";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageHistory from "./MessageHistory";
+import HowToUse from "./HowToUse";
 import Modal from "react-modal";
 import { IoEllipsisHorizontal } from "react-icons/io5";
-import { AiOutlineDelete } from 'react-icons/ai'; // Import any other icons you need
+import { AiOutlineDelete, AiOutlineQuestionCircle } from 'react-icons/ai'; // Import any other icons you need
 import { MdPayment } from 'react-icons/md';
 import { BiMessageDetail } from 'react-icons/bi';
 import { BsArrowRight } from 'react-icons/bs';
@@ -21,6 +22,7 @@ function Main() {
   const inputRef = useRef(null);
   const [data, setData] = useState("");
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isHowToUseModalOpen, setIsHowToUseModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
   const [deleteButtonText, setDeleteButtonText] = useState('Delete all chat data');
@@ -51,6 +53,10 @@ function Main() {
   
   const toggleHistoryModal = () => {
     setIsHistoryModalOpen(!isHistoryModalOpen);
+  };
+
+  const toggleHowToUseModal = () => {
+    setIsHowToUseModalOpen(!isHowToUseModalOpen);
   };
 
   const getCredits = async () => {
@@ -142,6 +148,11 @@ function Main() {
       icon: () => <MdPayment />
     },
     {
+      text: 'How to use',
+      action: () => {toggleHowToUseModal(); setIsMenuModalOpen(false)},
+      icon: () => <AiOutlineQuestionCircle />
+    },
+    {
       text: 'Show chat history',
       action: () => {toggleHistoryModal(); setIsMenuModalOpen(false); getCredits();},
       icon: () => <BiMessageDetail />
@@ -231,6 +242,14 @@ function Main() {
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end"
       >
         <MessageHistory messageHistory={messageHistory} credits={credits} />
+      </Modal>
+      <Modal
+        isOpen={isHowToUseModalOpen}
+        onRequestClose={toggleHowToUseModal}
+        className="bg-white p-4 rounded-lg shadow-md w-full max-w-md mx-auto mt-10"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end"
+      >
+        <HowToUse />
       </Modal>
       <p className='text-xs font-janna absolute bottom-0 self-center text-center mb-4'>By talking to Tori, you are agreeing to our <a className="underline text-[#ACB8A8]"href="/legal">Terms</a>.</p>
     </div>

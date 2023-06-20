@@ -67,7 +67,7 @@ def summarize_messages(messages) -> str:
 
 def summarize_summary(summary: str) -> str:
     summary = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0613",
         messages=[{"role": "system", "content": f"Summarize the summary, while keeping emotional details, and key personal info. Return a single string.\n\nSummary:\n{summary}\n\nSummary of summary:",}],
         max_tokens=256,
     )
